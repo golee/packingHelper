@@ -22,7 +22,9 @@
             android:name=".InsertActivity"
             android:theme="@style/AppTheme.Transparent" >
         </activity>
-        <activity android:name=".settingActivity" >
+        <activity
+                android:name=".SettingActivity"
+             android:theme="@style/AppTheme.Transparent">
         </activity>
     </application>
 

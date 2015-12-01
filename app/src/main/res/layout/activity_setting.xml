@@ -5,14 +5,103 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="project.hci.packinghelper.settingActivity">
+    tools:context="project.hci.packinghelper.SettingActivity">
     <LinearLayout
         android:layout_margin="25sp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/border_radius">
-        <ListView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></ListView>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:padding="15sp"
+                android:text="Settings"
+                android:gravity="center"
+                android:textStyle="bold"
+                ></TextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10sp"
+                android:drawableBottom="@android:color/background_dark"
+                android:text="Theme"
+                ></TextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10sp"
+                android:text="Icon sorting"
+                ></TextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10sp"
+                android:text="Icon arrange"
+                ></TextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10sp"
+                android:text="Notification"
+                ></TextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10sp"
+                android:text="Cancle"
+                ></TextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

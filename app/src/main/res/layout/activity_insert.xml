@@ -7,18 +7,143 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="project.hci.packinghelper.InsertActivity">
     <LinearLayout
-        android:layout_margin="25sp"
+        android:layout_margin="20sp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:background="@drawable/border_radius">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></RelativeLayout>
-        <RelativeLayout
+            android:layout_height="100sp"
+            android:gravity="center_vertical">
+            <EditText
+                android:hint="Item name"
+                android:layout_width="200sp"
+                android:layout_height="40sp"
+                android:background="@android:color/background_light"
+                android:layout_margin="10sp"/>
+        </RelativeLayout>
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></RelativeLayout>
-        <RelativeLayout
+            android:layout_height="1sp"
+            android:layout_margin="1sp"
+            android:background="@android:color/background_dark"
+            />
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></RelativeLayout>
+            android:layout_height="150sp"
+            android:orientation="vertical"
+            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:background="@drawable/border_radius"
+                    android:padding="4sp"
+                    android:textSize="19sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mon"/>
+                <TextView
+                    android:background="@drawable/border_radius"
+                    android:padding="4sp"
+                    android:textSize="19sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tue"/>
+                <TextView
+                    android:background="@drawable/border_radius"
+                    android:padding="4sp"
+                    android:textSize="19sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wed"/>
+                <TextView
+                    android:background="@drawable/border_radius"
+                    android:padding="4sp"
+                    android:textSize="19sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thu"/>
+                <TextView
+                    android:background="@drawable/border_radius"
+                    android:padding="4sp"
+                    android:textSize="19sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fri"/>
+                <TextView
+                    android:background="@drawable/border_radius"
+                    android:padding="4sp"
+                    android:textSize="19sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sat"/>
+                <TextView
+                    android:background="@drawable/border_radius"
+                    android:padding="4sp"
+                    android:textSize="19sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sun"/>
+            </LinearLayout>
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="20sp"
+                android:layout_margin="10sp"
+                android:text="Everyday"/>
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="20sp"
+                android:layout_margin="10sp"
+                android:text="Weekdays"/>
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="20sp"
+                android:layout_margin="10sp"
+                android:text="Weekend"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:layout_margin="1sp"
+            android:background="@android:color/background_dark"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70sp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_margin="15sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/btn_star_big_on"/>
+            <Spinner
+                android:background="@android:color/background_light"
+                android:layout_margin="20sp"
+                android:layout_width="match_parent"
+                android:layout_height="25sp"
+                android:id="@+id/spinner"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:entries="@array/spinnerItems">
+                </Spinner>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1sp"
+            android:layout_margin="1sp"
+            android:background="@android:color/background_dark"
+            />
+        <Button
+            android:text="Add"
+            android:layout_margin="20sp"
+            android:textSize="20sp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </RelativeLayout>

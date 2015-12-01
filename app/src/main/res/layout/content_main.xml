@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@android:color/darker_gray"
+    android:background="#AA0000"
     android:weightSum="10"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
@@ -17,19 +17,43 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:background="#fedcba">
-        <ListView
+        android:gravity="bottom"
+        android:background="@drawable/main_background">
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"></ListView>
-        <ListView
+            android:orientation="vertical"
+            android:layout_weight="2"
+            >
+        </RelativeLayout>
+        <View
+            android:layout_height="match_parent"
+            android:layout_width="3sp"
+            android:layout_marginTop="15sp"
+            android:layout_marginBottom="15sp"
+            android:background="@android:color/darker_gray"
+            ></View>
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"></ListView>
-        <ListView
+            android:orientation="vertical"
+            android:layout_weight="2"
+            >
+        </RelativeLayout>
+        <View
+            android:layout_height="match_parent"
+            android:layout_width="3sp"
+            android:layout_marginTop="15sp"
+            android:layout_marginBottom="15sp"
+            android:background="@android:color/darker_gray"
+            ></View>
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"></ListView>
+            android:orientation="vertical"
+            android:layout_weight="2"
+            >
+        </RelativeLayout>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
