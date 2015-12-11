@@ -1,8 +1,11 @@
 package project.hci.packinghelper;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.ArraySet;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,7 +13,24 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
+
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.util.Set;
 
 public class InsertActivity extends Activity {
 
@@ -20,11 +40,14 @@ public class InsertActivity extends Activity {
     CheckBox checkBoxWeekend;
 
     Spinner spinnerIconSelect;
+    LinearLayout layoutRoot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert);
+        layoutRoot = (LinearLayout)findViewById(R.id.layoutRoot);
+
         final EditText editTextItemName = (EditText) findViewById(R.id.editTextItemName);
         Button buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonSet[0] = (Button)findViewById(R.id.buttonDay0);
@@ -75,6 +98,12 @@ public class InsertActivity extends Activity {
                     앱 저장소는  SharedPreferences 이용.
                 3.
                  */
+                addToServer( itemName );
+                Set<String> strSet = new HashSet();
+                SharedPreferences sp = getSharedPreferences("my", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                sp.getStringSet("itemList", strSet).add(itemName);
+                editor.putStringSet("itemList",sp.getStringSet("itemList", strSet));
             }
         });
     }
@@ -114,5 +143,53 @@ public class InsertActivity extends Activity {
             }
         }
     };
+    final static String TargetURL = "http://61.72.174.90/hci/dbAccess.php";
+    String httpResponse;
+    private void addToServer ( String itemName ) {
+        TransferThread thread = new TransferThread( itemName );
+        thread.start();
+    }
+    class TransferThread extends Thread {
+        String itemName;
+        public void setItemName ( String itemName ) {
+            this.itemName = itemName;
+        }
+        public TransferThread ( String itemName ) {
+            this.itemName = itemName;
+        }
+        public void run() {
+            try {
+                URL url;
+                byte[] unitByte;
+                url = new URL(TargetURL+"?cmd=add&id="+itemName);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setChunkedStreamingMode(0);
+
+                InputStream inputStream = conn.getInputStream();
+                Scanner scanner = new Scanner(inputStream);
+                while( scanner.hasNext() ) {
+                    String response = scanner.nextLine();
+                        httpResponse = response;
+                }
+                // JB: Android 에서는 Uithread 외에 다른 thread에서 ui를 바로 못만져서 이렇게...
+                runOnUiThread(new Runnable(){
+                    @Override
+                    public void run(){
+                        try{
+                            Snackbar.make(layoutRoot, httpResponse, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
 

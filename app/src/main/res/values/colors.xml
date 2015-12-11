@@ -9,4 +9,6 @@
     <color name="oldboysLightGray">#D9D9D9</color>
 
     <color name="oldboysDark">#333333</color>
+    <color name="oldboysDarkRed">#550000</color>
+
 </resources>
