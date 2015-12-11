@@ -3,4 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="oldboysDarkGray">#8C8C8C</color>
+    <color name="oldboysGray">#A6A6A6</color>
+    <color name="oldboysLightGray">#D9D9D9</color>
+
+    <color name="oldboysDark">#333333</color>
 </resources>

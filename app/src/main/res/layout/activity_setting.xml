@@ -10,7 +10,7 @@
         android:layout_margin="25sp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/border_radius">
+        android:background="@drawable/popup_background">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -32,7 +32,7 @@
                 />
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1sp"
+                android:layout_height="2sp"
                 android:layout_margin="1sp"
                 android:background="@android:color/background_dark"
                 />
@@ -89,13 +89,27 @@
                 android:layout_margin="1sp"
                 android:background="@android:color/background_dark"
                 />
-            <TextView
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10sp"
+                android:text="Important Item Noti"
+                ></Button>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_margin="1sp"
+                android:background="@android:color/background_dark"
+                />
+            <Button
+                android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:padding="10sp"
                 android:text="Cancle"
-                ></TextView>
+                ></Button>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1sp"

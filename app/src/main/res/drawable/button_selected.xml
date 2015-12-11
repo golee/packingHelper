@@ -7,7 +7,7 @@
     </solid>
     <stroke
         android:width="2dp"
-        android:color= "@color/oldboysGray">
+        android:color= "@color/oldboysDark">
     </stroke>
     <padding
         android:left="5dp"
@@ -15,7 +15,6 @@
         android:right="5dp"
         android:bottom="5dp"    >
     </padding>
-
     <corners
         android:radius="11dp"   >
     </corners>

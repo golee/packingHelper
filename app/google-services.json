@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_id": "hcipush",
+    "project_number": "109625908854",
+    "name": "hciPush"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:109625908854:android:7210ba7a13a59f8a",
+        "client_id": "android:project.hci.packinghelper",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "project.hci.packinghelper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

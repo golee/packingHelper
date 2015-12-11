@@ -3,11 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle"   >
     <solid
-        android:color="@color/oldboysDarkGray" >
+        android:color="@color/oldboysGray" >
     </solid>
     <stroke
         android:width="2dp"
-        android:color= "@color/oldboysGray">
+        android:color= "@color/oldboysLightGray">
     </stroke>
     <padding
         android:left="5dp"
