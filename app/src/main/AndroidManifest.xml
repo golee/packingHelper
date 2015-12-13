@@ -26,6 +26,8 @@
                 android:name=".SettingActivity"
              android:theme="@style/AppTheme.Transparent">
         </activity>
+        <activity android:name=".ThemeActivity"
+            android:theme="@style/AppTheme.Transparent"></activity>
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"

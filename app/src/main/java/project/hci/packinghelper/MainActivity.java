@@ -5,25 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.MenuView;
-import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -32,7 +23,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,9 +33,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -106,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         if ( requestCode==1 && resultCode == RESULT_OK) {
             String itemName = data.getExtras().getString("itemName");
             boolean[] arrayBooleanDay = data.getExtras().getBooleanArray("arrayBooleanDay");
-            int lastTrue = 0;
+            int lastTrue = 7;
             for ( int i=0; i<7; i++ ) {
                 if ( arrayBooleanDay[i] ) {
                     lastTrue = i;
@@ -137,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 for ( int i=0; i<7; i++ ) {
                     if ( v.getId() == buttonSet[i].getId() ) {
                         today = i;
-                        showList();
+                        updateItem();
                     }
                     else
                         buttonSet[i].setSelected(false);
@@ -173,6 +161,8 @@ public class MainActivity extends AppCompatActivity {
                 linearLayout.addView(itemBlock);
                 itemBlock.setText(p.itemName);
                 itemBlock.setImage(R.drawable.ic_item_books);
+                if (p.isChecked)
+                    itemBlock.setColorFilter(R.color.colorPrimary);
                 itemBlock.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -180,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                         final String id = i.getText();
 
                         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                        dialogBuilder.setTitle("Server address to uplaod");
+                        dialogBuilder.setTitle(id);
                         dialogBuilder.setNegativeButton("Fix",
                                 new DialogInterface.OnClickListener() {
                                     @Override
@@ -197,13 +187,8 @@ public class MainActivity extends AppCompatActivity {
                                 });
                         AlertDialog dialogServerSetting = dialogBuilder.create();
                         dialogServerSetting.show();
-
-
                     }
                 });
-                if (p.isChecked)
-                    itemBlock.setColorFilter(R.color.colorPrimary);
-
             }
         }
     }
@@ -243,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
     class TransferThread extends Thread {
         String httpResponse = "";
         String targetURL;
-        boolean updating;
+        boolean updating = false;
         public void setUrl ( String url ) {
             targetURL = url;
         }
@@ -281,39 +266,39 @@ public class MainActivity extends AppCompatActivity {
                         if ( result.length() == 0 )
                             ;
                         else if (result.get(0).equals("true") || result.get(0).equals("false"))
-                            if ( updating )   // Case of Add, Delete item
+                            Log.d("Jebum", "beforeUp");
+                            if ( updating ) {  // Case of Add, Delete item
                                 updateItem();
+                                Log.d("Jebum", "afterUp");
+                            }
                         else {  // Select, getList, getitem
                             arrayListPackingItem.clear();
                             for (int i = 0; i < result.length(); i++) {
                                 JSONObject j = result.getJSONObject(i);
+                                boolean isChecked;
+                                if ( Integer.parseInt(j.getString("isChecked")) == 0 )
+                                    isChecked = false;
+                                else
+                                    isChecked = true;
                                 arrayListPackingItem.add(new PackingItem(
                                                 j.getString("id"),
                                                 Integer.parseInt(j.getString("day")),
-                                                Boolean.parseBoolean(j.getString("isChecked"))
+                                                isChecked
                                 ));
                             }
+                                Log.d("Jebum","ping");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showList();
+                                }
+                            });
                         }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showList();
-                            }
-                        });
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Toast.makeText(MainActivity.this, httpResponse, Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
