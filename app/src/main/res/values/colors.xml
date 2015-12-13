@@ -10,5 +10,6 @@
 
     <color name="oldboysDark">#333333</color>
     <color name="oldboysDarkRed">#550000</color>
+    <color name="oldboysDarkBlue">#00008B</color>
 
 </resources>

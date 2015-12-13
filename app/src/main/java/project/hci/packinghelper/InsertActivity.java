@@ -1,6 +1,7 @@
 package project.hci.packinghelper;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -49,7 +50,7 @@ public class InsertActivity extends Activity {
         layoutRoot = (LinearLayout)findViewById(R.id.layoutRoot);
 
         final EditText editTextItemName = (EditText) findViewById(R.id.editTextItemName);
-        Button buttonAdd = (Button) findViewById(R.id.buttonAdd);
+        final Button buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonSet[0] = (Button)findViewById(R.id.buttonDay0);
         buttonSet[1] = (Button)findViewById(R.id.buttonDay1);
         buttonSet[2] = (Button)findViewById(R.id.buttonDay2);
@@ -91,19 +92,26 @@ public class InsertActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String itemName = editTextItemName.getText().toString();
-
+                if ( itemName.equals("") ) {
+                    Toast.makeText(InsertActivity.this, "Empty text input", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                /*
                 1. 서버로 보냄(아이템 이름만)
                 2. 성공시 앱에도 추가
                     앱 저장소는  SharedPreferences 이용.
                 3.
                  */
-                addToServer( itemName );
-                Set<String> strSet = new HashSet();
-                SharedPreferences sp = getSharedPreferences("my", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sp.edit();
-                sp.getStringSet("itemList", strSet).add(itemName);
-                editor.putStringSet("itemList",sp.getStringSet("itemList", strSet));
+                boolean[] arrayBooleanDay = new boolean[7];
+                for ( int i=0; i<7; i++ ) {
+                    arrayBooleanDay[i] = buttonSet[i].isPressed();
+                }
+
+                Intent intent = new Intent();
+                intent.putExtra("itemName", itemName);
+                intent.putExtra("arrayBooleanDay", arrayBooleanDay);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }
@@ -143,53 +151,9 @@ public class InsertActivity extends Activity {
             }
         }
     };
-    final static String TargetURL = "http://61.72.174.90/hci/dbAccess.php";
-    String httpResponse;
-    private void addToServer ( String itemName ) {
-        TransferThread thread = new TransferThread( itemName );
-        thread.start();
-    }
-    class TransferThread extends Thread {
-        String itemName;
-        public void setItemName ( String itemName ) {
-            this.itemName = itemName;
-        }
-        public TransferThread ( String itemName ) {
-            this.itemName = itemName;
-        }
-        public void run() {
-            try {
-                URL url;
-                byte[] unitByte;
-                url = new URL(TargetURL+"?cmd=add&id="+itemName);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setDoOutput(true);
-                conn.setChunkedStreamingMode(0);
 
-                InputStream inputStream = conn.getInputStream();
-                Scanner scanner = new Scanner(inputStream);
-                while( scanner.hasNext() ) {
-                    String response = scanner.nextLine();
-                        httpResponse = response;
-                }
-                // JB: Android 에서는 Uithread 외에 다른 thread에서 ui를 바로 못만져서 이렇게...
-                runOnUiThread(new Runnable(){
-                    @Override
-                    public void run(){
-                        try{
-                            Snackbar.make(layoutRoot, httpResponse, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                        }catch(Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
+
 
 }
 
