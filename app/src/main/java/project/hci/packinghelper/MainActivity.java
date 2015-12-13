@@ -1,7 +1,9 @@
 package project.hci.packinghelper;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,15 +12,19 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -26,6 +32,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,20 +42,23 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Snackbar를 사용하자 ~~ Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+    Button[] buttonSet = new Button[7];
+    int today;
     RelativeLayout layoutRoot;
     final static String DefaultUrl = "http://61.72.174.90/hci/dbAccess.php";
     private ArrayList<PackingItem> arrayListPackingItem = new ArrayList<>();
     class PackingItem {
-        PackingItem ( String itemName, int day) {
+        PackingItem ( String itemName, int day, boolean isChecked) {
             this.itemName = itemName;
             this.day = day;
+            this.isChecked = isChecked;
         }
         String itemName;
         int day;
@@ -60,11 +70,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         layoutRoot = (RelativeLayout)findViewById(R.id.layoutRoot);
+        buttonSet[0] = (Button)findViewById(R.id.buttonDay0);
+        buttonSet[1] = (Button)findViewById(R.id.buttonDay1);
+        buttonSet[2] = (Button)findViewById(R.id.buttonDay2);
+        buttonSet[3] = (Button)findViewById(R.id.buttonDay3);
+        buttonSet[4] = (Button)findViewById(R.id.buttonDay4);
+        buttonSet[5] = (Button)findViewById(R.id.buttonDay5);
+        buttonSet[6] = (Button)findViewById(R.id.buttonDay6);
+        for (Button b : buttonSet)
+            b.setOnClickListener(dayButtonListner);
+
+        today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK); // 0~6 MON~SUN
+        if ( today == 1 )
+            today = 6;
+        else
+            today -=2;
+        buttonSet[today].setSelected(true);
         registBroadcastReceiver();
         getInstanceIdToken();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
+        updateItem();
     }
 
     @Override
@@ -81,18 +106,45 @@ public class MainActivity extends AppCompatActivity {
         if ( requestCode==1 && resultCode == RESULT_OK) {
             String itemName = data.getExtras().getString("itemName");
             boolean[] arrayBooleanDay = data.getExtras().getBooleanArray("arrayBooleanDay");
+            int lastTrue = 0;
             for ( int i=0; i<7; i++ ) {
-                if ( arrayBooleanDay[i] )
-                    addToServer(itemName, i);
+                if ( arrayBooleanDay[i] ) {
+                    lastTrue = i;
+                }
             }
-
+            for ( int i=0; i<7; i++ ) {
+                if ( i == lastTrue )
+                    addToServer(itemName, i, true);
+                else if ( arrayBooleanDay[i] ) {
+                    addToServer(itemName, i);
+                }
+            }
+/*
             Set<String> strSet = new HashSet();
             SharedPreferences sp = getSharedPreferences("my", MODE_PRIVATE);
             SharedPreferences.Editor editor = sp.edit();
             sp.getStringSet("itemList", strSet).add(itemName);
-            editor.putStringSet("itemList", sp.getStringSet("itemList", strSet));
+            editor.putStringSet("itemList", sp.getStringSet("itemList", strSet));*/
         }
     }
+    View.OnClickListener dayButtonListner = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if ( v.isSelected() )
+                ;
+            else {
+                v.setSelected(true);
+                for ( int i=0; i<7; i++ ) {
+                    if ( v.getId() == buttonSet[i].getId() ) {
+                        today = i;
+                        showList();
+                    }
+                    else
+                        buttonSet[i].setSelected(false);
+                }
+            }
+        }
+    };
 
     private void showList() {
         if ( arrayListPackingItem.isEmpty() ) {
@@ -103,40 +155,104 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout linearLayoutColFirst = (LinearLayout)findViewById(R.id.linearLayoutColFirst);
             LinearLayout linearLayoutColSecond = (LinearLayout)findViewById(R.id.linearLayoutColSecond);
             LinearLayout linearLayoutColThird = (LinearLayout)findViewById(R.id.linearLayoutColThird);
-            LayoutInflater inflater = LayoutInflater.from(this);
-            LayoutInflater vi = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+            linearLayoutColFirst.removeAllViews();
+            linearLayoutColSecond.removeAllViews();
+            linearLayoutColThird.removeAllViews();
             // Layout 마다 4개짜리 array제공?
-            ItemBlock itemBlock = new ItemBlock(this, null);
-            itemBlock.setText("books");
-            itemBlock.setImage(R.drawable.ic_item_books);
-            linearLayoutColFirst.addView(itemBlock);
+            int rotator = 0;
+            for ( PackingItem p: arrayListPackingItem ) {
+                LinearLayout linearLayout=null;
+                if ( p.day != today)
+                    continue;
+                switch ( rotator++ ) {
+                    case 0:linearLayout=linearLayoutColFirst;break;
+                    case 1:linearLayout=linearLayoutColSecond;break;
+                    case 2:linearLayout=linearLayoutColThird;rotator=0;break;
+                }
+                ItemBlock itemBlock = new ItemBlock(this);
+                linearLayout.addView(itemBlock);
+                itemBlock.setText(p.itemName);
+                itemBlock.setImage(R.drawable.ic_item_books);
+                itemBlock.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ItemBlock i = (ItemBlock)v;
+                        final String id = i.getText();
+
+                        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        dialogBuilder.setTitle("Server address to uplaod");
+                        dialogBuilder.setNegativeButton("Fix",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(MainActivity.this, "Item Fixed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        dialogBuilder.setPositiveButton("Delete",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        deleteItem(id);
+                                        Toast.makeText(MainActivity.this, "Item Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        AlertDialog dialogServerSetting = dialogBuilder.create();
+                        dialogServerSetting.show();
+
+
+                    }
+                });
+                if (p.isChecked)
+                    itemBlock.setColorFilter(R.color.colorPrimary);
+
+            }
         }
     }
 
-    private void getItem () {
+    private void updateItem () {
         String url = DefaultUrl + "?cmd=getList";
         TransferThread thread = new TransferThread( url );
         thread.start();
     }
     private void addToServer ( String itemName, int day ) {
+        addToServer(itemName, day, false);
+    }
+
+    private void addToServer ( String itemName, int day, boolean updating ) {
         // 요일 넣어야함.
         try {
-            String url = DefaultUrl + "?cmd=add&id=" + URLEncoder.encode(itemName, "UTF-8") + "day=" + day;
-            TransferThread thread = new TransferThread( url );
+            String url = DefaultUrl + "?cmd=add&id=" + URLEncoder.encode(itemName, "UTF-8") + "&day=" + day;
+            TransferThread thread = new TransferThread( url, updating );
             thread.start();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
-    String httpResponse = "";
+
+    // 일단은 싸그리 삭제~
+    private void deleteItem ( String itemName ) {
+        try {
+            String url = DefaultUrl + "?cmd=delete&id=" + URLEncoder.encode(itemName, "UTF-8");
+            TransferThread thread = new TransferThread( url, true );
+            thread.start();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // url 로 http connection
     class TransferThread extends Thread {
+        String httpResponse = "";
         String targetURL;
+        boolean updating;
         public void setUrl ( String url ) {
             targetURL = url;
         }
         public TransferThread ( String url ) {
             this.targetURL = url;
+        }
+        public TransferThread ( String url, boolean updating ) {
+            this.targetURL = url;
+            this.updating = updating;
         }
         public void run() {
             try {
@@ -149,41 +265,55 @@ public class MainActivity extends AppCompatActivity {
 
                 InputStream inputStream = conn.getInputStream();
                 Scanner scanner = new Scanner(inputStream);
+                httpResponse = "";
                 while( scanner.hasNext() ) {
                     String response = scanner.nextLine();
                     httpResponse += response;
                 }
-                Log.d("httpResponseResultJebum", httpResponse);
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = new JSONObject(httpResponse);
-                    JSONArray result= jsonObject.getJSONArray("result");
-                    if ( result.get(0).equals("true") || result.get(0).equals("false") )
-                        ;   // Case of Add, Delete item
-                    else {
-                        arrayListPackingItem.clear();
-                        for ( int i=0; i<result.length(); i++ ) {
-                            arrayListPackingItem.add(new PackingItem(
-                                            result.getJSONObject(i).getString("id"),
-                                            Integer.parseInt(result.getJSONObject(i).getString("day")))
-                            );
+                Log.i("Jebum", httpResponse);
+                if ( httpResponse.contains("Error"))
+                    Toast.makeText(MainActivity.this, "SQL Syntax Error: "+httpResponse, Toast.LENGTH_LONG);
+                else{
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(httpResponse);
+                        JSONArray result = jsonObject.getJSONArray("result");
+                        if ( result.length() == 0 )
+                            ;
+                        else if (result.get(0).equals("true") || result.get(0).equals("false"))
+                            if ( updating )   // Case of Add, Delete item
+                                updateItem();
+                        else {  // Select, getList, getitem
+                            arrayListPackingItem.clear();
+                            for (int i = 0; i < result.length(); i++) {
+                                JSONObject j = result.getJSONObject(i);
+                                arrayListPackingItem.add(new PackingItem(
+                                                j.getString("id"),
+                                                Integer.parseInt(j.getString("day")),
+                                                Boolean.parseBoolean(j.getString("isChecked"))
+                                ));
+                            }
                         }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showList();
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            showList();
-                            Snackbar.make(layoutRoot, httpResponse, Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
+                            Toast.makeText(MainActivity.this, httpResponse, Toast.LENGTH_SHORT).show();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 });
-                httpResponse = "";
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {

@@ -47,7 +47,6 @@ public class InsertActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert);
-        layoutRoot = (LinearLayout)findViewById(R.id.layoutRoot);
 
         final EditText editTextItemName = (EditText) findViewById(R.id.editTextItemName);
         final Button buttonAdd = (Button) findViewById(R.id.buttonAdd);
@@ -104,8 +103,14 @@ public class InsertActivity extends Activity {
                  */
                 boolean[] arrayBooleanDay = new boolean[7];
                 for ( int i=0; i<7; i++ ) {
-                    arrayBooleanDay[i] = buttonSet[i].isPressed();
+                    arrayBooleanDay[i] = buttonSet[i].isSelected();
+                    Log.d("ping", Boolean.toString(arrayBooleanDay[i]));
                 }
+
+                if ( !arrayBooleanDay[0] && !arrayBooleanDay[1] && !arrayBooleanDay[2] && !arrayBooleanDay[3] && !arrayBooleanDay[4] && !arrayBooleanDay[5] && !arrayBooleanDay[6] )
+                    for ( int i=0; i<7; i++ ){
+                        arrayBooleanDay[i] = true;
+                    }
 
                 Intent intent = new Intent();
                 intent.putExtra("itemName", itemName);

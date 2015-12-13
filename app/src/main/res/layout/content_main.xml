@@ -25,8 +25,9 @@
             android:id="@+id/linearLayoutColFirst"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="5sp"
             android:orientation="vertical"
-            android:gravity="bottom"
+            android:gravity="center_horizontal|bottom"
             android:layout_weight="2"
             >
         </LinearLayout>
@@ -41,9 +42,10 @@
             android:id="@+id/linearLayoutColSecond"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="5sp"
             android:orientation="vertical"
             android:layout_weight="2"
-            android:gravity="bottom"
+            android:gravity="center_horizontal|bottom"
             >
         </LinearLayout>
         <View
@@ -57,9 +59,10 @@
             android:id="@+id/linearLayoutColThird"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="5sp"
             android:orientation="vertical"
             android:layout_weight="2"
-            android:gravity="bottom"
+            android:gravity="center_horizontal|bottom"
             >
         </LinearLayout>
     </LinearLayout>

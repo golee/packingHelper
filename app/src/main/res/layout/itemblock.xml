@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="100sp"
+    android:layout_marginBottom="10sp"
+    android:layout_gravity="center_horizontal"
+    android:gravity="center"
     android:orientation="vertical"
+    android:background="@drawable/border_radius"
     >
     <ImageView
         android:id="@+id/imageViewItemBlock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="60sp"
+        android:layout_height="60sp">
     </ImageView>
     <TextView
         android:id="@+id/textViewItemBlock"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"/>
+        android:hint="no text"
+        android:textColor="@color/oldboysLightGray"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="16sp"/>
 
 </LinearLayout>

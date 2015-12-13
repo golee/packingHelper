@@ -12,4 +12,16 @@
     <color name="oldboysDarkRed">#550000</color>
     <color name="oldboysDarkBlue">#00008B</color>
 
+    <color name="oldboysAzure">#F0FFFF</color>
+    <color name="oldboysCadetBlue">#5F9EA0</color>
+    <color name="oldboysBeige">#F5F5DC</color>
+    <color name="oldboysChocolate">#D2691E</color>
+    <color name="oldboysCornflowerBlue">#6495ED</color>
+    <color name="oldboysDarkGreen">#006400</color>
+    <color name="oldboysHotPink">#FF69B4</color>
+    <color name="oldboysLightGreen">#90EE90</color>
+    <color name="oldboysMediumVioletRed">#C71585</color>
+    <color name="oldboysKhaki">#F0E68C</color>
+    <color name="oldboysFireBrick">#B22222</color>
+
 </resources>
