@@ -17,15 +17,15 @@
             android:layout_width="match_parent"
             android:layout_height="100sp"
             android:gravity="center">
-            <EditText
-                android:id="@+id/editTextItemName"
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextViewItemName"
                 android:background="@drawable/edittext_background"
+                android:completionThreshold="1"
                 android:hint="Item name"
                 android:paddingLeft="10sp"
                 android:layout_width="210sp"
                 android:layout_height="50sp"
                 android:textSize="30sp"
-                android:singleLine="true"
                 android:layout_margin="10sp"/>
         </RelativeLayout>
         <View
@@ -161,7 +161,7 @@
                     android:id="@+id/imageViewIconPreview"
                     android:layout_width="40sp"
                     android:layout_height="40sp"
-                    android:background="@android:drawable/ic_menu_search"/>
+                    android:src="@android:drawable/ic_menu_search"/>
             </RelativeLayout>
             <Spinner
                 android:id="@+id/spinnerIconSelect"
@@ -172,7 +172,7 @@
                 android:layout_height="35sp"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:entries="@array/spinnerItems">
+                android:entries="@array/icons">
                 </Spinner>
         </LinearLayout>
         <View

@@ -3,12 +3,13 @@ package project.hci.packinghelper;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,14 +44,18 @@ public class MainActivity extends AppCompatActivity {
     final static String DefaultUrl = "http://61.72.174.90/hci/dbAccess.php";
     private ArrayList<PackingItem> arrayListPackingItem = new ArrayList<>();
     class PackingItem {
-        PackingItem ( String itemName, int day, boolean isChecked) {
+        PackingItem ( String itemName, int day, boolean isChecked, boolean isImportant, int icon) {
             this.itemName = itemName;
             this.day = day;
             this.isChecked = isChecked;
+            this.isImportant = isImportant;
+            this.icon = icon;
         }
         String itemName;
         int day;
+        int icon;
         boolean isChecked;
+        boolean isImportant;
     }
 
     @Override
@@ -74,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
         else
             today -=2;
         buttonSet[today].setSelected(true);
+        DataReceiver data = new DataReceiver() {
+            @Override
+            protected void onDataRefresh(Intent intent) {
+                updateItem();
+            }
+        };
+
         registBroadcastReceiver();
         getInstanceIdToken();
 
@@ -93,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if ( requestCode==1 && resultCode == RESULT_OK) {
             String itemName = data.getExtras().getString("itemName");
+            int icon = data.getExtras().getInt("icon");
             boolean[] arrayBooleanDay = data.getExtras().getBooleanArray("arrayBooleanDay");
             int lastTrue = 7;
             for ( int i=0; i<7; i++ ) {
@@ -102,9 +115,9 @@ public class MainActivity extends AppCompatActivity {
             }
             for ( int i=0; i<7; i++ ) {
                 if ( i == lastTrue )
-                    addToServer(itemName, i, true);
+                    addToServer(itemName, i, icon, true);
                 else if ( arrayBooleanDay[i] ) {
-                    addToServer(itemName, i);
+                    addToServer(itemName, i, icon);
                 }
             }
 /*
@@ -135,20 +148,23 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void showList() {
+        LinearLayout linearLayoutColFirst = (LinearLayout)findViewById(R.id.linearLayoutColFirst);
+        LinearLayout linearLayoutColSecond = (LinearLayout)findViewById(R.id.linearLayoutColSecond);
+        LinearLayout linearLayoutColThird = (LinearLayout)findViewById(R.id.linearLayoutColThird);
         if ( arrayListPackingItem.isEmpty() ) {
+            linearLayoutColFirst.removeAllViews();
+            linearLayoutColSecond.removeAllViews();
+            linearLayoutColThird.removeAllViews();
             Log.d("Jebum","Empty arrayListPackingItem");
             return;
         }
         else {
-            LinearLayout linearLayoutColFirst = (LinearLayout)findViewById(R.id.linearLayoutColFirst);
-            LinearLayout linearLayoutColSecond = (LinearLayout)findViewById(R.id.linearLayoutColSecond);
-            LinearLayout linearLayoutColThird = (LinearLayout)findViewById(R.id.linearLayoutColThird);
             linearLayoutColFirst.removeAllViews();
             linearLayoutColSecond.removeAllViews();
             linearLayoutColThird.removeAllViews();
             // Layout 마다 4개짜리 array제공?
             int rotator = 0;
-            for ( PackingItem p: arrayListPackingItem ) {
+            for ( final PackingItem p: arrayListPackingItem ) {
                 LinearLayout linearLayout=null;
                 if ( p.day != today)
                     continue;
@@ -160,31 +176,53 @@ public class MainActivity extends AppCompatActivity {
                 ItemBlock itemBlock = new ItemBlock(this);
                 linearLayout.addView(itemBlock);
                 itemBlock.setText(p.itemName);
-                itemBlock.setImage(R.drawable.ic_item_books);
+                itemBlock.setImage(getIconId(p.icon));
                 if (p.isChecked)
                     itemBlock.setColorFilter(R.color.colorPrimary);
+                else if (p.isImportant)
+                    itemBlock.setColorFilter(R.color.oldboysDarkRed);
                 itemBlock.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         ItemBlock i = (ItemBlock)v;
                         final String id = i.getText();
 
+                        ContextThemeWrapper ctw = new ContextThemeWrapper(MainActivity.this, android.R.style.Holo_Light_ButtonBar_AlertDialog);
                         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
                         dialogBuilder.setTitle(id);
-                        dialogBuilder.setNegativeButton("Fix",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Toast.makeText(MainActivity.this, "Item Fixed", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                        dialogBuilder.setPositiveButton("Delete",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        deleteItem(id);
-                                        Toast.makeText(MainActivity.this, "Item Deleted", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                        Button buttonFix = new Button(ctw);
+                        buttonFix.setText("Fix");
+                        buttonFix.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(MainActivity.this, "Item Fixed", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                        Button buttonImportant = new Button(ctw);
+                        buttonImportant.setText("Set importance");
+                        buttonImportant.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                updateImportance(id, p.isImportant);
+                                Toast.makeText(MainActivity.this, "Importance set", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        Button buttonDelete = new Button(ctw);
+                        buttonDelete.setText("Delete");
+                        buttonDelete.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                deleteItem(id);
+                                Toast.makeText(MainActivity.this, "Item Deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        LinearLayout ll=new LinearLayout(ctw);
+                        ll.setOrientation(LinearLayout.VERTICAL);
+                        ll.addView(buttonFix);
+                        ll.addView(buttonImportant);
+                        ll.addView(buttonDelete);
+                        dialogBuilder.setView(ll);
                         AlertDialog dialogServerSetting = dialogBuilder.create();
                         dialogServerSetting.show();
                     }
@@ -198,15 +236,24 @@ public class MainActivity extends AppCompatActivity {
         TransferThread thread = new TransferThread( url );
         thread.start();
     }
-    private void addToServer ( String itemName, int day ) {
-        addToServer(itemName, day, false);
+    private void addToServer ( String itemName, int day, int icon ) {
+        addToServer(itemName, day, icon, false);
     }
 
-    private void addToServer ( String itemName, int day, boolean updating ) {
+    private void addToServer ( String itemName, int day, int icon, boolean updating ) {
         // 요일 넣어야함.
         try {
-            String url = DefaultUrl + "?cmd=add&id=" + URLEncoder.encode(itemName, "UTF-8") + "&day=" + day;
+            String url = DefaultUrl + "?cmd=add&id="+URLEncoder.encode(itemName, "UTF-8") + "&day="+day +"&icon="+icon;
             TransferThread thread = new TransferThread( url, updating );
+            thread.start();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+    private void updateImportance(String id, boolean isImportant) {
+        try {
+            String url = DefaultUrl + "?cmd=important&id=" + URLEncoder.encode(id, "UTF-8") + "&isImportant="+Boolean.toString(isImportant);
+            TransferThread thread = new TransferThread( url, true );
             thread.start();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -221,6 +268,20 @@ public class MainActivity extends AppCompatActivity {
             thread.start();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+        }
+    }
+    private int getIconId (int icon) {
+        switch ( icon ) {
+            case 0: return R.drawable.ic_item_tea;
+            case 1: return R.drawable.ic_item_books;
+            case 2: return R.drawable.ic_item_edit;
+            case 3: return R.drawable.ic_item_literature;
+            case 4: return R.drawable.ic_item_mac_os;
+            case 5: return R.drawable.ic_item_paper;
+            case 6: return R.drawable.ic_item_star;
+            case 7: return R.drawable.ic_item_umbrella;
+            case 8: return R.drawable.ic_item_usb_connected;
+            default: return R.drawable.ic_item_tea;
         }
     }
 
@@ -242,7 +303,6 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             try {
                 URL url;
-                byte[] unitByte;
                 url = new URL(targetURL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoOutput(true);
@@ -256,21 +316,31 @@ public class MainActivity extends AppCompatActivity {
                     httpResponse += response;
                 }
                 Log.i("Jebum", httpResponse);
-                if ( httpResponse.contains("Error"))
-                    Toast.makeText(MainActivity.this, "SQL Syntax Error: "+httpResponse, Toast.LENGTH_LONG);
+                if ( httpResponse.contains("Error")) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "SQL Syntax Error: " + httpResponse, Toast.LENGTH_LONG);
+                        }
+                    });
+                }
+                else if ( httpResponse.contains("token inserted")) {
+                    Log.i("Jebum", "Token inserted");
+                }
                 else{
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(httpResponse);
+                        String cmd = jsonObject.getString("cmd");
+                        Log.d("Jebum cmd", cmd);
                         JSONArray result = jsonObject.getJSONArray("result");
                         if ( result.length() == 0 )
                             ;
-                        else if (result.get(0).equals("true") || result.get(0).equals("false"))
-                            Log.d("Jebum", "beforeUp");
-                            if ( updating ) {  // Case of Add, Delete item
+                        else if (cmd.equals("add") ||cmd.equals("delete") ||cmd.equals("important") ||cmd.equals("fix") ) {
+                            if (updating) {  // Case of Add, Delete item
                                 updateItem();
-                                Log.d("Jebum", "afterUp");
                             }
+                        }
                         else {  // Select, getList, getitem
                             arrayListPackingItem.clear();
                             for (int i = 0; i < result.length(); i++) {
@@ -280,13 +350,19 @@ public class MainActivity extends AppCompatActivity {
                                     isChecked = false;
                                 else
                                     isChecked = true;
+                                boolean isImportant;
+                                if ( Integer.parseInt(j.getString("isImportant")) == 0 )
+                                    isImportant = false;
+                                else
+                                    isImportant = true;
                                 arrayListPackingItem.add(new PackingItem(
                                                 j.getString("id"),
                                                 Integer.parseInt(j.getString("day")),
-                                                isChecked
+                                                isChecked,
+                                                isImportant,
+                                                Integer.parseInt(j.getString("icon"))
                                 ));
                             }
-                                Log.d("Jebum","ping");
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -324,13 +400,13 @@ public class MainActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 if(action.equals(QuickstartPreferences.REGISTRATION_READY)){
-                    Log.i(TAG, "regestrationReady");
+                    Log.i(TAG, "registrationReady");
                     // 액션이 READY일 경우
                 } else if(action.equals(QuickstartPreferences.REGISTRATION_GENERATING)){
-                    Log.i(TAG, "regestrationGenerating");
+                    Log.i(TAG, "registrationGenerating");
                     // 액션이 GENERATING일 경우
                 } else if(action.equals(QuickstartPreferences.REGISTRATION_COMPLETE)){
-                    Log.i(TAG, "regestrationComplete");
+                    Log.i(TAG, "registrationComplete");
                     // 액션이 COMPLETE일 경우
                     String token = intent.getStringExtra("token");
                 }
@@ -350,6 +426,13 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+    public abstract  class DataReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            onDataRefresh(intent);
+        }
+        protected abstract void onDataRefresh(Intent intent);
     }
 
     @Override

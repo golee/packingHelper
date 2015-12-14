@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="recommanded">
+        <item>칫솔</item>
+        <item>노트</item>
+        <item>물통</item>
+        <item>우산</item>
+        <item>커피</item>
+        <item>노트북</item>
+        <item>보조배터리</item>
+        <item>치약</item>
+        <item>스케쥴러</item>
+    </string-array>
+
+    <string-array name="icons">
+        <item>Tea</item>
+        <item>Books</item>
+        <item>Pencil</item>
+        <item>Literature</item>
+        <item>Mac</item>
+        <item>Paper</item>
+        <item>Star</item>
+        <item>Umbrella</item>
+        <item>Usb</item>
+    </string-array>
+    <string-array name="themes">
+        <item>Deep Blue</item>
+        <item>Deep Red</item>
+        <item>Azure</item>
+        <item>Literature</item>
+        <item>Mac</item>
+        <item>Galaxy</item>
+        <item>iPhone</item>
+        <item>Win10</item>
+        <item>CLI</item>
+    </string-array>
+    <string-array name="sorting_algorithms">
+        <item>Recently missed</item>
+        <item>Frequently missed</item>
+        <item>Recently used</item>
+        <item>Frequently used</item>
+    </string-array>
+</resources>

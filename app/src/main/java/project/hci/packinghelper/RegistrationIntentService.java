@@ -9,6 +9,11 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Scanner;
 
 /**
  * Created by saltfactory on 6/8/15.
@@ -56,5 +61,28 @@ public class RegistrationIntentService extends IntentService {
         Intent registrationComplete = new Intent(QuickstartPreferences.REGISTRATION_COMPLETE);
         registrationComplete.putExtra("token", token);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+        String dburl = "http://61.72.174.90/hci/gcm/sendMessage.php?token="+token;
+        URL url = null;
+        try {
+            url = new URL(dburl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setChunkedStreamingMode(0);
+            InputStream inputStream = conn.getInputStream();
+            Scanner scanner = new Scanner(inputStream);
+            String httpResponse = "";
+            while( scanner.hasNext() ) {
+                String response = scanner.nextLine();
+                httpResponse += response;
+            }
+            Log.i("Jebum",httpResponse);
+            conn.disconnect();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

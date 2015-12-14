@@ -24,7 +24,7 @@
         </activity>
         <activity
                 android:name=".SettingActivity"
-             android:theme="@style/AppTheme.Transparent">
+             android:theme="@style/PreferencesTheme">
         </activity>
         <activity android:name=".ThemeActivity"
             android:theme="@style/AppTheme.Transparent"></activity>

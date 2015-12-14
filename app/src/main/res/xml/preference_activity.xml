@@ -1,0 +1,58 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Title">
+        <CheckBoxPreference
+        android:key="checkbox_preference"
+        android:title="title_checkbox_preference"
+        android:summary="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+    android:title="Visuallity">
+
+        <ListPreference
+            android:key="sorting_preference"
+            android:title="Sorting Algorithm"
+            android:summary=""
+            android:entries="@array/sorting_algorithms"
+            android:entryValues="@array/sorting_algorithms"
+            android:dialogTitle="Sorting" />
+        <ListPreference
+            android:key="theme_preference"
+            android:title="Theme"
+            android:summary=""
+            android:entries="@array/themes"
+            android:entryValues="@array/themes"
+            android:dialogTitle="Themes" />
+        </PreferenceCategory>
+
+    <PreferenceCategory
+    android:title="Notification">
+
+        <CheckBoxPreference
+            android:key="notification_checkbox_preference"
+            android:title="Allow notification"
+            android:summary="" />
+        <CheckBoxPreference
+            android:key="importantnoti_checkbox_preference"
+            android:dependency="notification_checkbox_preference"
+            android:title="Important Item noti"
+            android:summary="" />
+
+        <!-- The visual style of a child is defined by this styled theme attribute. -->
+        <CheckBoxPreference
+            android:key="notisound_checkbox_preference"
+            android:dependency="notification_checkbox_preference"
+            android:layout="?android:attr/preferenceLayoutChild"
+            android:title="Noti sound"
+            android:summary="" />
+        <RingtonePreference
+            android:key="ringtone_preference"
+            android:dependency="notisound_checkbox_preference"
+            android:layout="?android:attr/preferenceLayoutChild"
+            android:title="Set Ringtone"
+            android:summary="" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

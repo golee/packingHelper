@@ -2,36 +2,20 @@ package project.hci.packinghelper;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.ArraySet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.Set;
 
 public class InsertActivity extends Activity {
 
@@ -39,7 +23,10 @@ public class InsertActivity extends Activity {
     CheckBox checkBoxEveryday;
     CheckBox checkBoxWeekdays;
     CheckBox checkBoxWeekend;
+    AutoCompleteTextView autoCompleteTextViewItemName;
+    Button buttonAdd;
 
+    ImageView imageViewIconPreview;
     Spinner spinnerIconSelect;
     LinearLayout layoutRoot;
 
@@ -48,8 +35,19 @@ public class InsertActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert);
 
-        final EditText editTextItemName = (EditText) findViewById(R.id.editTextItemName);
-        final Button buttonAdd = (Button) findViewById(R.id.buttonAdd);
+        autoCompleteTextViewItemName = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewItemName);
+        autoCompleteTextViewItemName.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.recommanded)));
+        autoCompleteTextViewItemName.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                autoCompleteTextViewItemName.showDropDown();
+                return false;
+            }
+        });
+
+        buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonSet[0] = (Button)findViewById(R.id.buttonDay0);
         buttonSet[1] = (Button)findViewById(R.id.buttonDay1);
         buttonSet[2] = (Button)findViewById(R.id.buttonDay2);
@@ -65,17 +63,29 @@ public class InsertActivity extends Activity {
         checkBoxWeekdays.setOnClickListener(dayButtonListner);
         checkBoxWeekend.setOnClickListener(dayButtonListner);
 
+
+        imageViewIconPreview = (ImageView)findViewById(R.id.imageViewIconPreview);
         spinnerIconSelect = (Spinner)findViewById(R.id.spinnerIconSelect);
         ArrayAdapter<?> sAdpapter = ArrayAdapter.createFromResource(
-                this, R.array.spinnerItems, R.layout.spinner_item);
+                this, R.array.icons, R.layout.spinner_item);
         sAdpapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerIconSelect.setAdapter(sAdpapter);
-
-
         spinnerIconSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                String selectedItem = (String) spinnerIconSelect.getSelectedItem();
+                switch (selectedItem) {
+                    case "Tea": imageViewIconPreview.setImageResource(R.drawable.ic_item_tea);break;
+                    case "Books": imageViewIconPreview.setImageResource(R.drawable.ic_item_books);break;
+                    case "Pencil": imageViewIconPreview.setImageResource(R.drawable.ic_item_edit);break;
+                    case "Literature": imageViewIconPreview.setImageResource(R.drawable.ic_item_literature);break;
+                    case "Mac": imageViewIconPreview.setImageResource(R.drawable.ic_item_mac_os);break;
+                    case "Paper": imageViewIconPreview.setImageResource(R.drawable.ic_item_paper);break;
+                    case "Star": imageViewIconPreview.setImageResource(R.drawable.ic_item_star);break;
+                    case "Umbrella": imageViewIconPreview.setImageResource(R.drawable.ic_item_umbrella);break;
+                    case "Usb": imageViewIconPreview.setImageResource(R.drawable.ic_item_usb_connected);break;
+                    default:imageViewIconPreview.setImageResource(R.drawable.ic_item_tea);
+                }
             }
 
             @Override
@@ -90,8 +100,8 @@ public class InsertActivity extends Activity {
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String itemName = editTextItemName.getText().toString();
-                if ( itemName.equals("") ) {
+                String itemName = autoCompleteTextViewItemName.getText().toString();
+                if (itemName.equals("")) {
                     Toast.makeText(InsertActivity.this, "Empty text input", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -102,19 +112,19 @@ public class InsertActivity extends Activity {
                 3.
                  */
                 boolean[] arrayBooleanDay = new boolean[7];
-                for ( int i=0; i<7; i++ ) {
+                for (int i = 0; i < 7; i++) {
                     arrayBooleanDay[i] = buttonSet[i].isSelected();
-                    Log.d("ping", Boolean.toString(arrayBooleanDay[i]));
                 }
-
-                if ( !arrayBooleanDay[0] && !arrayBooleanDay[1] && !arrayBooleanDay[2] && !arrayBooleanDay[3] && !arrayBooleanDay[4] && !arrayBooleanDay[5] && !arrayBooleanDay[6] )
-                    for ( int i=0; i<7; i++ ){
+                if (!arrayBooleanDay[0] && !arrayBooleanDay[1] && !arrayBooleanDay[2] && !arrayBooleanDay[3] && !arrayBooleanDay[4] && !arrayBooleanDay[5] && !arrayBooleanDay[6])
+                    for (int i = 0; i < 7; i++) {
                         arrayBooleanDay[i] = true;
                     }
 
+                int icon = spinnerIconSelect.getSelectedItemPosition();
                 Intent intent = new Intent();
                 intent.putExtra("itemName", itemName);
                 intent.putExtra("arrayBooleanDay", arrayBooleanDay);
+                intent.putExtra("icon", icon);
                 setResult(RESULT_OK, intent);
                 finish();
             }
