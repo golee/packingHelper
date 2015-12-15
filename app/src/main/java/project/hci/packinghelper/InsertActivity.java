@@ -63,6 +63,7 @@ public class InsertActivity extends Activity {
         checkBoxWeekdays.setOnClickListener(dayButtonListner);
         checkBoxWeekend.setOnClickListener(dayButtonListner);
 
+        checkBoxEveryday.performClick();
 
         imageViewIconPreview = (ImageView)findViewById(R.id.imageViewIconPreview);
         spinnerIconSelect = (Spinner)findViewById(R.id.spinnerIconSelect);

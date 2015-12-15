@@ -37,12 +37,20 @@ public class MyGcmListenerService extends GcmListenerService {
         // GCM으로 받은 메세지를 디바이스에 알려주는 sendNotification()을 호출한다.
         if ( cmd.equals("update") ) {
             Intent update = new Intent("update");
-            LocalBroadcastManager.getInstance(this).sendBroadcast(update);
+            sendBroadcast(update);
         }
-        else
+        else {
             sendNotification(title, message);
+            showPopUpNotification(message);
+        }
     }
-
+    private void showPopUpNotification ( String message ) {
+        // Make popup: Call PopupActivity
+        Intent popupIntent = new Intent(this, PopupActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        popupIntent.putExtra("message", message);
+        startActivity(popupIntent);
+    }
 
     /**
      * 실제 디바에스에 GCM으로부터 받은 메세지를 알려주는 함수이다. 디바이스 Notification Center에 나타난다.

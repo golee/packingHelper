@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isChecked;
         boolean isImportant;
     }
-
+    BroadcastReceiver dataReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,13 +80,16 @@ public class MainActivity extends AppCompatActivity {
         else
             today -=2;
         buttonSet[today].setSelected(true);
-        DataReceiver data = new DataReceiver() {
+        dataReceiver = new BroadcastReceiver() {
+
             @Override
-            protected void onDataRefresh(Intent intent) {
-                updateItem();
+            public void onReceive(Context context, Intent intent) {
+                if(intent.getAction().equals("update")) {
+                    updateItem();
+                }
             }
         };
-
+        registerReceiver(dataReceiver, new IntentFilter("update"));
         registBroadcastReceiver();
         getInstanceIdToken();
 
@@ -146,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
+    AlertDialog dialogServerSetting;
     private void showList() {
         LinearLayout linearLayoutColFirst = (LinearLayout)findViewById(R.id.linearLayoutColFirst);
         LinearLayout linearLayoutColSecond = (LinearLayout)findViewById(R.id.linearLayoutColSecond);
@@ -188,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         final String id = i.getText();
 
                         ContextThemeWrapper ctw = new ContextThemeWrapper(MainActivity.this, android.R.style.Holo_Light_ButtonBar_AlertDialog);
-                        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
                         dialogBuilder.setTitle(id);
                         Button buttonFix = new Button(ctw);
                         buttonFix.setText("Fix");
@@ -196,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 Toast.makeText(MainActivity.this, "Item Fixed", Toast.LENGTH_SHORT).show();
-
+                                dialogServerSetting.dismiss();
                             }
                         });
                         Button buttonImportant = new Button(ctw);
@@ -206,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(View v) {
                                 updateImportance(id, p.isImportant);
                                 Toast.makeText(MainActivity.this, "Importance set", Toast.LENGTH_SHORT).show();
+                                dialogServerSetting.dismiss();
                             }
                         });
                         Button buttonDelete = new Button(ctw);
@@ -215,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(View v) {
                                 deleteItem(id);
                                 Toast.makeText(MainActivity.this, "Item Deleted", Toast.LENGTH_SHORT).show();
+                                dialogServerSetting.dismiss();
                             }
                         });
                         LinearLayout ll=new LinearLayout(ctw);
@@ -223,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                         ll.addView(buttonImportant);
                         ll.addView(buttonDelete);
                         dialogBuilder.setView(ll);
-                        AlertDialog dialogServerSetting = dialogBuilder.create();
+                        dialogServerSetting = dialogBuilder.create();
                         dialogServerSetting.show();
                     }
                 });
@@ -334,14 +340,12 @@ public class MainActivity extends AppCompatActivity {
                         String cmd = jsonObject.getString("cmd");
                         Log.d("Jebum cmd", cmd);
                         JSONArray result = jsonObject.getJSONArray("result");
-                        if ( result.length() == 0 )
-                            ;
-                        else if (cmd.equals("add") ||cmd.equals("delete") ||cmd.equals("important") ||cmd.equals("fix") ) {
+                        if (cmd.equals("add") ||cmd.equals("delete") ||cmd.equals("important") ||cmd.equals("fix") ) {
                             if (updating) {  // Case of Add, Delete item
                                 updateItem();
                             }
                         }
-                        else {  // Select, getList, getitem
+                        else if (cmd.equals("getList")) {  // Select, getList, getitem
                             arrayListPackingItem.clear();
                             for (int i = 0; i < result.length(); i++) {
                                 JSONObject j = result.getJSONObject(i);
@@ -370,6 +374,8 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                         }
+                        else
+                            Log.d("Jebum", "Wrong command");
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -427,12 +433,17 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-    public abstract  class DataReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            onDataRefresh(intent);
-        }
-        protected abstract void onDataRefresh(Intent intent);
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(dataReceiver, new IntentFilter("update"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(dataReceiver);
     }
 
     @Override
