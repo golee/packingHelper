@@ -118,7 +118,6 @@
                     android:gravity="center"
                     android:text="일"/>
             </LinearLayout>
-
             <CheckBox
                 android:id="@+id/checkboxEveryday"
                 android:layout_width="match_parent"
